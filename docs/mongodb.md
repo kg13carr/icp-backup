@@ -37,6 +37,8 @@ Run the following command to dump to the master node's filesystem. This will cre
 
 ```kubectl -n kube-system exec icp-mongodb-0 -- sh -c 'mkdir -p /work-dir/Backup/mongodump; mongodump --oplog --out /work-dir/Backup/mongodump --host rs0/mongodb:27017 --username admin --password $ADMIN_PASSWORD --authenticationDatabase admin --ssl --sslCAFile /data/configdb/tls.crt --sslPEMKeyFile /work-dir/mongo.pem' ```
 
+NOTE: If using an ICP version prior to 3.1.1 `--sslCAFile /data/configdb/tls.crt` should be `--sslCAFile /ca/tls.crt`
+
 Backup data can then archived with a timestamp and moved elsewhere.
 
 Run the following commands to dump to a PV
@@ -69,6 +71,8 @@ Run the following to restore data saved to the master node's filesystem.
 ```
 kubectl -n kube-system exec icp-mongodb-0 -- sh -c 'mongorestore --host rs0/mongodb:27017 --username admin --password $ADMIN_PASSWORD --authenticationDatabase admin --ssl --sslCAFile /data/configdb/tls.crt --sslPEMKeyFile /work-dir/mongo.pem /work-dir/Backup/mongodump'
 ```
+
+NOTE: If using an ICP version prior to 3.1.1 `--sslCAFile /data/configdb/tls.crt` should be `--sslCAFile /ca/tls.crt`
 
 Run the following to restore data saved to a persistent volume.
 
