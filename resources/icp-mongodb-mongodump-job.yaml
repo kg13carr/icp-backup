@@ -1,0 +1,22 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: mongoutil-mongodump
+  namespace: kube-system
+spec:
+  template:
+    spec:
+      containers:
+      - name: mongoutil-mongodump
+        image: ibmcom/icp-mongodb
+        command: ["mongodump", "--oplog --out /work-dir/Backup/mongodump --host rs0/mongodb:27017 --username admin --password $ADMIN_PASSWORD --authenticationDatabase admin --ssl --sslCAFile /data/configdb/tls.crt --sslPEMKeyFile /work-dir/mongo.pem'
+"]
+        volumeMounts:
+        - mountPath: "/dump"
+          name: mongodump
+      volumes:
+      - name: mongodump
+        persistentVolumeClaim:
+          claimName: mongoutil-mongodump
+      restartPolicy: Never
+backoffLimit: 4
