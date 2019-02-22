@@ -13,12 +13,12 @@ In this topic, we describe how to perform a backup and restore on this MongoDB i
 * Restore a MongoDB database
 * Perform data Validation
 
+Before going forward please NOTE: If using an ICP version prior to 3.1.1 `--sslCAFile /data/configdb/tls.crt` should be `--sslCAFile /ca/tls.crt` when using `mongo` `mongodump` or `mongorestore` commands.
 ### (Optional) Load data into the sample MongoDB
 
 Load some data into this database.  First run the following command to connect:
-```kubectl exec -n kube-system -it icp-mongodb-0 -- sh -c 'mongo --host rs0/mongodb:27017 --username $ADMIN_USER --password $ADMIN_PASSWORD --authenticationDatabase admin --ssl --sslCAFile /data/configdb/tls.crt --sslPEMKeyFile /work-dir/mongo.pem'```
 
-NOTE: If using an ICP version prior to 3.1.1 `--sslCAFile /data/configdb/tls.crt` should be `--sslCAFile /ca/tls.crt`
+```kubectl exec -n kube-system -it icp-mongodb-0 -- sh -c 'mongo --host rs0/mongodb:27017 --username $ADMIN_USER --password $ADMIN_PASSWORD --authenticationDatabase admin --ssl --sslCAFile /data/configdb/tls.crt --sslPEMKeyFile /work-dir/mongo.pem'```
 
 You will be directed to the MongoDB CLI prompt. Run the following commands to load some data:
 ```
@@ -26,7 +26,9 @@ db.myCollection.insertOne({ key1: "value1" });
 db.myCollection.insertOne({ key2: "value2" });
 ```
 
-Next, run the following command to retrieve the values:  `db.myCollection.find()`
+Next, run the following command to retrieve the values:  
+
+`db.myCollection.find()`
 
 ## Backup MongoDB
 MongoDB provides a tool that we will leverage for backup called **mongodump**.  
@@ -39,9 +41,7 @@ Run the following command to dump to the master node's filesystem. This will cre
 
 ```kubectl -n kube-system exec icp-mongodb-0 -- sh -c 'mkdir -p /work-dir/Backup/mongodump; mongodump --oplog --out /work-dir/Backup/mongodump --host rs0/mongodb:27017 --username $ADMIN_USER --password $ADMIN_PASSWORD --authenticationDatabase admin --ssl --sslCAFile /data/configdb/tls.crt --sslPEMKeyFile /work-dir/mongo.pem' ```
 
-NOTE: If using an ICP version prior to 3.1.1 `--sslCAFile /data/configdb/tls.crt` should be `--sslCAFile /ca/tls.crt`
-
-Backup data can then archived with a timestamp and moved elsewhere.
+Backup data can then be archived with a timestamp and moved elsewhere.
 
 ### Dump backup onto a Persistent Volume
 
@@ -81,13 +81,9 @@ If you run:  `db.myCollection.find()` you will see there is a single document in
 
 ## Restore the MongoDB Database
 
-Run the following to restore data saved to the master node's filesystem. 
+Run the following to restore data saved to the master node's filesystem:
 
-```
-kubectl -n kube-system exec icp-mongodb-0 -- sh -c 'mongorestore --host rs0/mongodb:27017 --username $ADMIN_USER --password $ADMIN_PASSWORD --authenticationDatabase admin --ssl --sslCAFile /data/configdb/tls.crt --sslPEMKeyFile /work-dir/mongo.pem /work-dir/Backup/mongodump'
-```
-
-NOTE: If using an ICP version prior to 3.1.1 `--sslCAFile /data/configdb/tls.crt` should be `--sslCAFile /ca/tls.crt`
+```kubectl -n kube-system exec icp-mongodb-0 -- sh -c 'mongorestore --host rs0/mongodb:27017 --username $ADMIN_USER --password $ADMIN_PASSWORD --authenticationDatabase admin --ssl --sslCAFile /data/configdb/tls.crt --sslPEMKeyFile /work-dir/mongo.pem /work-dir/Backup/mongodump'```
 
 Run the following to restore data saved to a persistent volume.
 
@@ -97,6 +93,7 @@ To restore the MongoDB database, run the following command:
 > It is a good practice to now validate the data has been restored.  Rehearse the process with an optional standalone instance.
 
 From **within** in the MongoDB CLI Pod, run the following commands:
+
 ```kubectl exec -n kube-system -it icp-mongodb-0 -- sh -c 'mongo --host rs0/mongodb:27017 --username $ADMIN_USER --password $ADMIN_PASSWORD --authenticationDatabase admin --ssl --sslCAFile /data/configdb/tls.crt --sslPEMKeyFile /work-dir/mongo.pem'```
 
 `db.myCollection.find()`
