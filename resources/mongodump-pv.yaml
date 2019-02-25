@@ -11,5 +11,5 @@ spec:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
   nfs:
-    path: /opt/nfs/mongodump
-    server: 10.10.25.43
+    path: <mounted directory>
+    server: <nfs server ip address>
