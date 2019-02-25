@@ -45,7 +45,7 @@ Backup data can then be archived with a timestamp and moved elsewhere.
 
 ### Dump backup onto a Persistent Volume
 
-Run the following commands to dump to a PV. The *mongodump-pv.yaml*, *mongodump-pvc.yaml*, *icp-mongodb-mongodump-job.yaml*, and *icp-mongodb-mongorestore-job.yaml* files can be found in `icp-backup/resources`.
+Run the following commands to dump to a PV. The *mongodump-pv.yaml*, *mongodump-pvc.yaml*, *icp-mongodb-mongodump-job.yaml*, and *icp-mongodb-mongorestore-job.yaml* files can be found in `icp-backup/resources` of this repository.
 
 First, we need to create a PV. If you are going this route, you should consult kubernetes doc on how to create the PV you are looking for. https://kubernetes.io/docs/concepts/storage/persistent-volumes/#persistent-volumes
 
@@ -81,16 +81,22 @@ If you run:  `db.myCollection.find()` you will see there is a single document in
 
 ## Restore the MongoDB Database
 
+### Restore backup from local filesystem
+
+In the dump instructions, you dumped the mongoDB database into /var/lib/icp/mongodb/work-dir/backup/mongodump and presumably archived and moved it else where. To restore it, you need to move that archive back into /var/lib/icp/mongodb/work-dir/backup/mongodump, unarchive it and run the mongorestore command. 
+
 Run the following to restore data saved to the master node's filesystem:
 
 ```kubectl -n kube-system exec icp-mongodb-0 -- sh -c 'mongorestore --host rs0/mongodb:27017 --username $ADMIN_USER --password $ADMIN_PASSWORD --authenticationDatabase admin --ssl --sslCAFile /data/configdb/tls.crt --sslPEMKeyFile /work-dir/mongo.pem /work-dir/Backup/mongodump'```
+
+### Restore backup from a Persistent Volume
 
 Run the following to restore data saved to a persistent volume.
 
 To restore the MongoDB database, run the following command:
 ```kubectl apply -f icp-mongodb-mongorestore-job.yaml```
 
-> It is a good practice to now validate the data has been restored.  Rehearse the process with an optional standalone instance.
+## (Optional) Validate the data has been restored
 
 From **within** in the MongoDB CLI Pod, run the following commands:
 
